@@ -9,6 +9,7 @@ public static class FileGetter{
 public String [] getAllFiles(String path){
   
   String [] filesInFolder = (new File(path)).list();
+  
   for(int h = 0; h < filesInFolder.length; h++){
     if(new File(path +"\\"+filesInFolder[h]).isDirectory()){
      getAllFiles(path+"\\"+filesInFolder[h]); 

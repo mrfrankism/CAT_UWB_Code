@@ -8,8 +8,6 @@ import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.ArrayList;
 import java.io.PrintWriter;
-//String fileName = "WaveformDataCOM4-30-1";
-//String filePath = "C:\\Users\\Public\\"+fileName+".txt";
 String [] catfullscanvariables = { 
   "Timestamp, ", "CatFullScanInfo, ", "MessageId, ", "SourceId, ", "Timestamp, ", "ChannelRiseTime, ", "vPeak, ", "LinearSnr, ", "LedIndex, ", "LockspotOffset, ", "ScanStartPs, ", "ScanStopPs, ", "ScanStepBins, ", "ScanFiltering, ", "AntennaId, ", "OperationalMode, ", "NumSamplesTotal, ", "ScanData"
 };
@@ -63,8 +61,7 @@ public void folderSelected(File selection){
     filePaths = getDirs.getAllFiles(filePath);
     println(filePaths);
     
-   // println(filePath);
-//println(files);
+   
 
 
 }
@@ -81,7 +78,7 @@ if(haveFiles == true){
     
   try {
     input = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(filePaths[i])), 1024));
-    //println(input.available());
+    
  
  
  while(input.available() > 0){
@@ -90,7 +87,7 @@ if(haveFiles == true){
     messageLength = readParameter(2); //reads length of the message
     cmdParameter = readParameter(2);//reads the command response
     messageId = readParameter(2);//reads the message ID
-   // println(messageLength + " " + cmdParameter + " " + messageId);
+   
 
 
 
@@ -106,7 +103,7 @@ if(haveFiles == true){
       {
         println("CAT_CONTROL_CONFIRM");
         parameters.put("Status", readParameter(4));
-       // println( "Status: " + parameters.get("Status"));
+       
         break;
       }
     default :
@@ -116,22 +113,21 @@ if(haveFiles == true){
       }
     }
   } else {
-   // println(readByte());
-    //println(readByte());
-    firstByte = secondByte;
-    // secondByte = readByte();
+    
+    /*firstByte = secondByte; // meant to be a better A5 A5 search algorithm but hasnt been properly tested
+    // secondByte = readByte();*/
     skipByteCounter++;
-    println("skippin" + skipByteCounter);
+    println("skippin" + skipByteCounter); // prints ammount of bytes skipped mainly tend to be zeros
   }
 
-  if (messageIndex + 1 == totalMessageNumber  && totalMessageNumber != 0) {
-    
+  if (messageIndex + 1 == totalMessageNumber  && totalMessageNumber != 0) { // to stop recording the previous scan and start recording a new one when the last message has bee recieved for the previous scan
+    // reseting variables and adding 1 to the scn numbber which limmits the ammount of scans per text file
     messageIndex = 0;
     totalMessageNumber = 0;
     scanNumber++;
     previousLength = 0;
-    newScan = true;
-    if (scanNumber == numOfScans) {
+    newScan = true; //sets newScan to true to print a new line in the text file for the next scan
+    if (scanNumber == numOfScans) { // closes the text file when it has reached the desired number of scans
       writer.flush();
       writer.close();
       writerExists = false;
@@ -220,9 +216,8 @@ public int readWaveformData() { //reads 4 bytes and concatinates them into an in
       output = (output << 8) | buffer[i];
     }
     if (output == -1) {
-      //println(input.available());
-    }
-    //println(output);
+      }
+    
     return output;
   }
   catch(FileNotFoundException e) {
@@ -255,10 +250,10 @@ public int readParameter(int len) { //reads up to 4 bytes at a time used to read
       buffer[i] = input.read();
     }
     for (int i = 0; i < buffer.length; i++) {
-      //println(buffer[i]);
+      
       output = (output << 8) | buffer[i];
     }
-    //println("PARA: " + output);
+    
     return output;
   }
   catch(FileNotFoundException e) {
@@ -270,7 +265,7 @@ public int readParameter(int len) { //reads up to 4 bytes at a time used to read
   return -1;
 }
 
-public void CATFULLSCANINFO() {
+public void CATFULLSCANINFO() { // used to store the various information recieved from the equipment ***this can probably be simpliefied with an array and a for loop adding to the todo list***
 
   //println("CAT_FULL_SCAN_INFO");
 
@@ -305,7 +300,7 @@ public void CATFULLSCANINFO() {
   // println( "Scan Step: " + parameters.get("Scan Step"));
 
   readParameter(2);// used to skip two reserved bytes
-  parameters.put("ScanFiltering", 0); //placeholder for scan filtering...
+  parameters.put("ScanFiltering", 0); //placeholder for scan filtering, IT IS IMPORTANT TO NOTE THAT THE LOG FILE LOGS THIS BUT THE API MENTIONS IT AS RESERVED BYTES THEREFORE IT IS CODED TO A DEFAULT 0
 
 
   parameters.put("AntennaId", readParameter(1));

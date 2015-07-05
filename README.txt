@@ -16,6 +16,10 @@ Questions, concerns or issues can be email to francoab10@gmail.com or opened up 
  - Create a String variable to easily change the conversion from CSV to a simple text file that can be used for other purposes
 
  - delete un-neccessary commented code that was used for debugging purposes
+ 
+ - Simplify the method CATFULLSCANINFO() in FromTXTtoCSV (also mentioned in code)
+
+ - look into the reserved bytes in the api and if they are truly the filter parameter in the log file
 --------------------------------------------------------------------------------------------------------------------------------------------------
 							********* UPDATES: *********
 ________________________________________________________________As of 07/05/15_____________________________________________________________________________
