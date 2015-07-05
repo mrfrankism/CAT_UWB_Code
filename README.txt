@@ -7,6 +7,8 @@ This code is intended to collect channel impluse response scans and record the s
 many applications of the P410 can be found on the Time Domain website "www.timedomain.com"
 
 To download or to get more information on Processing go to "www.processing.org"
+
+Questions, concerns or issues can be email to francoab10@gmail.com or opened up on Github
 ------------------------------------------------------------------------------------------------------------------------------
 							******** PENDING TODO: *********
  - Possibly combine the two programs into one to be able to read and directly convert to a CSV file
