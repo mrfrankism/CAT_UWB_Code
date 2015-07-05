@@ -5,6 +5,8 @@ the USB and Serial user guide also details neccessary communication protocols an
  
 This code is intended to collect channel impluse response scans and record the scan information so that later MATLAB can be used to futher analyze it. Information on the 
 many applications of the P410 can be found on the Time Domain website "www.timedomain.com"
+
+To download or to get more information on Processing go to "www.processing.org"
 ------------------------------------------------------------------------------------------------------------------------------
 							******** PENDING TODO: *********
  - Possibly combine the two programs into one to be able to read and directly convert to a CSV file
