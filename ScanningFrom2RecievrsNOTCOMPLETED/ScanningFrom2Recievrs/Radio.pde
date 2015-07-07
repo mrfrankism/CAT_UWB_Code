@@ -29,7 +29,6 @@ public class Radio{
   public void startScan(){
     
    running = true;
-  String COM = "COM4";
   int zeroCounter = 0;
   int x = 0;
   PrintWriter objWriter;
