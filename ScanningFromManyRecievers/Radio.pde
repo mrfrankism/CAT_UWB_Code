@@ -1,6 +1,8 @@
 import processing.serial.*;
+import java.lang.Thread;
 
-public class Radio{
+
+public class Radio implements Runnable{
  private String COM;
  private boolean running;
  private int maxNumOfScans;
@@ -22,12 +24,7 @@ public class Radio{
    return running; 
   }
   
-  public void start(){
-   thread("startScan"); 
-  }
-  
-  public void startScan(){
-    
+  public void run(){
    running = true;
   int zeroCounter = 0;
   int x = 0;
@@ -35,7 +32,7 @@ public class Radio{
   Serial objSerial;
 
  // println("Turning on Serial"); 
-  objSerial = new Serial(new ScanningFrom2Recievrs(), COM, 9600);
+  objSerial = new Serial(new ScanningFromManyRecievers(), COM, 9600);
 
 
   try {
@@ -51,7 +48,7 @@ public class Radio{
 
 
   for (int numOfScans = 0; numOfScans < maxNumOfScans; numOfScans ++) {
-
+println("HERE");
     for (int i = 0; i < CATCONTROLREQUESTON.length; i++) {
       objSerial.write(CATCONTROLREQUESTON[i]); 
      // println(CATCONTROLREQUESTON[i]);
@@ -96,6 +93,7 @@ public class Radio{
   objWriter.close(); 
   objSerial.stop();
   running = false;
+  
 }
   }
   
