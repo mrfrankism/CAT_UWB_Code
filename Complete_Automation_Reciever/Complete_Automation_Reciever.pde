@@ -15,7 +15,7 @@ Serial serial;
 
 File folderPath;
 Radio [] recievers = new Radio[(serial.list()).length];
-int scansWanted = 15;
+int scansWanted = 2;
 int [] transmitGainValues = {15, 30, 45, 60};
 int port = 5203;
 
@@ -37,20 +37,24 @@ void setup(){
   folderPath.mkdirs();
 }
   
-
+int delay = 10000;
 
 void draw(){ 
-    if(serverRunning){
+    if(serverRunning && delay < millis()){
     for(int r = 0; r < transmitGainValues.length; r++){
    
-     myServer.write("3"+transmitGainValues[0]);
+     //myServer.write("3"+transmitGainValues[0]);
+     //waitForConfirm();
      myServer.write("2"); //command to start scans 
      waitForConfirm();
   
   for(Radio radio : recievers){
     radio.setCurrentGain(transmitGainValues[r]);
-    new Thread(radio).start(); 
+    radio.run(); 
+   
   }
+  
+  myServer.write("1");//command to stop scans
  }
 (new Converter(dir)).convert();
 exit();
@@ -77,10 +81,5 @@ void mousePressed(){
   }
   
 }
-boolean running = true;
-void keyPressed(){
- if(key == ENTER){ }
-  
-  
-}
+
 

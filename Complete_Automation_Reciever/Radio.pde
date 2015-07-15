@@ -46,7 +46,7 @@ public class Radio implements Runnable{
 
   try {
 
-    objWriter = new PrintWriter (new File(folderPath.getPath()+ "\\WaveformData" + COM + "-" + "Gain: "+ currentGainVal + "-" + maxNumOfScans +"-"+ fileCounter +".txt"));
+    objWriter = new PrintWriter (new File(folderPath.getPath()+ "\\WaveformData" + COM + "-" + "Gain "+ currentGainVal + "-" + maxNumOfScans +"-"+ fileCounter +".txt"));
   }
   catch(FileNotFoundException e) {
     println("NO FILE FOUND:"+ COM);
@@ -57,7 +57,7 @@ public class Radio implements Runnable{
 
 
   for (int numOfScans = 0; numOfScans < maxNumOfScans; numOfScans ++) {
-println("HERE");
+
     for (int i = 0; i < CATCONTROLREQUESTON.length; i++) {
       objSerial.write(CATCONTROLREQUESTON[i]); 
      // println(CATCONTROLREQUESTON[i]);
