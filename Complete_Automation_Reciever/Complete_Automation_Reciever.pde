@@ -13,7 +13,7 @@ import processing.net.*;
 Server myServer;
 Serial serial;
 
-
+File folderPath;
 Radio [] recievers = new Radio[(serial.list()).length];
 int scansWanted = 15;
 int [] transmitGainValues = {15, 30, 45, 60};
@@ -21,22 +21,40 @@ int port = 5203;
 
 int x = 0;
 boolean serverRunning = false;
+String dir = "C:\\Users\\Public\\TXTs";
 
 void setup(){
     for (int i = 0; i < recievers.length; i++) {
     recievers[i] = new Radio(serial.list()[i], scansWanted);
   }
   
-  
+   int y = 0;
+  while (new File (dir + "\\set" + y).exists()) {
+    y++;
+  }
+  dir = dir + "\\set" +  y;
+  folderPath = new File(dir);
+  folderPath.mkdirs();
 }
+  
+
 
 void draw(){ 
     if(serverRunning){
-    if(running == true){
-   myServer.write("2"); //command to start scans 
-   waitForConfirm();
+    for(int r = 0; r < transmitGainValues.length; r++){
+   
+     myServer.write("3"+transmitGainValues[0]);
+     myServer.write("2"); //command to start scans 
+     waitForConfirm();
   
+  for(Radio radio : recievers){
+    radio.setCurrentGain(transmitGainValues[r]);
+    new Thread(radio).start(); 
+  }
  }
+(new Converter(dir)).convert();
+exit();
+}
 }
 
 public void waitForConfirm(){

@@ -8,20 +8,22 @@ int [] CATCONTROLREQUESTOFF = {
   0xA5, 0xA5, 0x00, 0x08, 0x20, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00
 };
 
-public class Radio /*implements Runnable*/{
+public class Radio implements Runnable{
  private String COM;
  private boolean running;
  private int maxNumOfScans;
  private Serial objSerial;
- 
- 
+ private int currentGainVal;
+ private int fileCounter;
  Radio(String com, int n){
   COM = com;
-  maxNumOfScans = n;
-  
+  maxNumOfScans = n;  
  } 
   
-  /*
+  public void setCurrentGain(int g){
+   currentGainVal = g; 
+   fileCounter = 0;
+  }
   public void setNumOfScans(int o){
    maxNumOfScans = o; 
   }
@@ -31,6 +33,7 @@ public class Radio /*implements Runnable*/{
   }
   
   public void run(){
+    fileCounter++;
    running = true;
   int zeroCounter = 0;
   int x = 0;
@@ -43,12 +46,12 @@ public class Radio /*implements Runnable*/{
 
   try {
 
-    objWriter = new PrintWriter (new File(folderPath.getPath()+ "\\WaveformData" + COM + "-" + millis() + "-" + maxNumOfScans +"-"+ fileCounter +".txt"));
+    objWriter = new PrintWriter (new File(folderPath.getPath()+ "\\WaveformData" + COM + "-" + "Gain: "+ currentGainVal + "-" + maxNumOfScans +"-"+ fileCounter +".txt"));
   }
   catch(FileNotFoundException e) {
     println("NO FILE FOUND:"+ COM);
     exit();
-    objWriter = createWriter("C:\\Users\\Public\\WaveformData" + COM + "-" + counter + "-" + maxNumOfScans +" "+ fileCounter +".txt");
+    objWriter = createWriter("C:\\Users\\Public\\WaveformData" + COM + "-" + maxNumOfScans +" "+ fileCounter +".txt");
   }
 
 
@@ -100,5 +103,5 @@ println("HERE");
   objSerial.stop();
   running = false;
   
-}*/
+}
   }
