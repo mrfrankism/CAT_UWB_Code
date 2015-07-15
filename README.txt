@@ -30,7 +30,20 @@ Questions, concerns or issues can be email to francoab10@gmail.com or opened up 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 							********* UPDATES: *********
+
+________________________________________________________________As of 07/15/15_____________________________________________________________________________
+
+ - Added a few major changes 
+ 
+ - Added two new Complete automation programs for both reciever and transmitter. The idea is that the recievers will collect scans and then over a the internet
+   tell the transmitter to change its gain value, this allows someone to take multiple scans with different gain settings without having to manually change the settings
+   It is still not done but should be finished soon
+
+ - We will be testing this code if not the other (scanningfrommanyrecievers) tomorow so any observations/problems will be recorded tomorow
+   
+
 ________________________________________________________________As of 07/07/15_____________________________________________________________________________
+
 
  - Combined both programs (scanningFrom2Recievrs and FromTXTtoCSV) into one that prints straight into CSVs. It has the same functionality, speed, etc...
 
