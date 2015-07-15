@@ -12,7 +12,7 @@ Client myClient;
 Serial mySerial;
 Radio transmitter = new Radio(0); //currently configured to work with just one transmitter sending info to multiple recievers
 
-String ip = "10.107.195.134"; // ip for the client to connect to THIS MUST BE CHECKED BEFORE EVERY RUN!!
+String ip = "10.107.244.1"; // ip for the client to connect to THIS MUST BE CHECKED BEFORE EVERY RUN!!
 int port = 5203; // port number for the client to connect to.
 
 
@@ -47,6 +47,7 @@ void clientEvent(Client c){ // called when recieved info from server
   }
   else if(input.get(0) == 50){//start automated channel impulse response testing
     transmitter.startTransmitting();
+    println("recieved something");
     c.write("9");
   }
   else if(input.get(0) == 51){//change gain settings
