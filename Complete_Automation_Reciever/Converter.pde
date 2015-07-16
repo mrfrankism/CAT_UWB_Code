@@ -20,7 +20,6 @@ int [] scanData;
 
 
 int numOfScans = 2; //NO NEED TO CHANGE PROGRAM READSSETUP FILE 
-FileGetter getDirs;
 HashMap<String, Integer> parameters = new HashMap<String, Integer>();
 PrintWriter writer;
 int firstByte = 0;
@@ -39,16 +38,11 @@ boolean newScan = true;
 int counter = 0;
 boolean writerExists = false;
 int previousScanNumber = 0;
-boolean haveFiles = false;
 String [] filePaths;
 String filePath;
  Converter(String f){
-       haveFiles = true;
-    
-    getDirs = new FileGetter();
-    filePaths = getDirs.getAllFiles(f);
+    filePaths = new FileGetter().getAllFiles(f);
     println(filePaths);
-  
  }
 
 
@@ -56,24 +50,14 @@ String filePath;
   public void convert(){
     
     for(int f = 1; f < filePaths.length; f++){
-    
-    
-    
   try {
-    input = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(filePaths[f])), 1024));
-    
- 
- 
+    input = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(filePaths[f])), 1024)); 
  while(input.available() > 0){
   if (readByte() == 165 && readByte() == 165) {
     counter++;
     messageLength = readParameter(2); //reads length of the message
     cmdParameter = readParameter(2);//reads the command response
     messageId = readParameter(2);//reads the message ID
-   
-
-
-
     switch(cmdParameter) {
     case 0xF201:
       {
@@ -84,14 +68,14 @@ String filePath;
       }
     case 0x2103:
       {
-        println("CAT_CONTROL_CONFIRM");
+        //println("CAT_CONTROL_CONFIRM");
         parameters.put("Status", readParameter(4));
        
         break;
       }
     default :
       {
-        println("NO CASE FOUND");
+        //println("NO CASE FOUND");
         break;
       }
     }
@@ -100,7 +84,7 @@ String filePath;
     /*firstByte = secondByte; // meant to be a better A5 A5 search algorithm but hasnt been properly tested
     // secondByte = readByte();*/
     skipByteCounter++;
-    println("skippin" + skipByteCounter); // prints ammount of bytes skipped mainly tend to be zeros
+   // println("skippin" + skipByteCounter); // prints ammount of bytes skipped mainly tend to be zeros
   }
 
   if (messageIndex + 1 == totalMessageNumber  && totalMessageNumber != 0) { // to stop recording the previous scan and start recording a new one when the last message has bee recieved for the previous scan
@@ -128,9 +112,10 @@ String filePath;
   catch(IOException e) {
     println("IOException");
   }
+  println(skipByteCounter);
   scanNumber = 0;
  }
- exit();
+
 }
     
  public void writeScanData(int p) {
@@ -232,7 +217,6 @@ public int readParameter(int len) { //reads up to 4 bytes at a time used to read
       buffer[i] = input.read();
     }
     for (int i = 0; i < buffer.length; i++) {
-      
       output = (output << 8) | buffer[i];
     }
     
