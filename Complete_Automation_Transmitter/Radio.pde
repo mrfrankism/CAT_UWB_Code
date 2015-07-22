@@ -36,14 +36,14 @@ int [] CATSETCONFIGREQUEST = {//message is 72 bytes long without preamble
   0x02, //data type BER 
   0x20, 0x20, 0x20, 0x20, //payload pri
   0x20, 0x20, 0x20, 0x20, //payload duration
-  0xff, 0xff, 0xff, 0xec, // scan start -20
+  0xff, 0xff, 0xff, 0x14, // scan start -20
   0x00, 0x00, 0x00, 0x50, //scan stop 80
   0x00, 0x20, //step bin size 
   0x01, //scan integration index 
   0x20, 
   0x20, 0x20, 
   0x20, 
-  0x01 //persist yes
+  0x00 //persist yes
 };
 
 public class Radio {
@@ -67,17 +67,13 @@ public class Radio {
   
   public void serialOn(boolean o){
    if (o == true) objSerial = new Serial(new Complete_Automation_Transmitter(), COM, 9600);
-   else objSerial.stop();
+   
   }
 
   public void startTransmitting() {
-    
-    input = new byte[8];
-    boolean messageDone = false;
     for (int i = 0; i < CATCONTROLREQUESTON.length; i++) {
       objSerial.write(CATCONTROLREQUESTON[i]);
-    } 
-    
+    }     
   }
 
   public void stopTransmitting() {
@@ -93,6 +89,8 @@ public class Radio {
     CATSETCONFIGREQUEST [15] = g; //sets the gain in the API structure
     for (int i = 0; i < CATSETCONFIGREQUEST.length; i++) { //writes the new gain to the transmitter
       objSerial.write(CATSETCONFIGREQUEST[i]);
+      
+      
     }
     
   }
