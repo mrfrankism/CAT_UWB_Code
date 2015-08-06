@@ -1,0 +1,246 @@
+package Package;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.util.Scanner;
+import javax.swing.*;
+
+import jssc.*;
+
+public class ScanningFromManyReceivers extends JPanel implements ActionListener{
+	
+    /**
+	 * 
+	 */
+	private static String settingDir = "C:\\Users\\Public\\settings.txt"; //default directory for settings file 
+	private static final long serialVersionUID = 1L;
+	static private final String newline = "\n";
+    JButton setDirectoryButton, stopButton, startButton;
+    JTextField textField, timeBetweenScans, amountOfScansPerFile, startDelayField;
+    JLabel delayBetweenScans, scansPerFile, startDelayTime;
+    public static JTextArea log;
+    JFileChooser fc;
+    static Radio [] devices;
+    boolean directorySet = false;
+    String defaultDir = "C:\\Users\\Public\\";
+	Timer scanTimer, startTimer;
+  public ScanningFromManyReceivers(){
+   
+	  super(new BorderLayout());
+	 
+    //Create the log first, because the action listeners
+    //need to refer to it.
+    log = new JTextArea(7,25);
+    log.setMargin(new Insets(5,5,5,5));
+    log.setEditable(false);
+    JScrollPane logScrollPane = new JScrollPane(log);
+
+    //Create a file chooser
+    fc = new JFileChooser();
+
+    //Uncomment one of the following lines to try a different
+    //file selection mode.  The first allows just directories
+    //to be selected (and, at least in the Java look and feel,
+    //shown).  The second allows both files and directories
+    //to be selected.  If you leave these lines commented out,
+    //then the default mode (FILES_ONLY) will be used.
+    //
+    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    //fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
+    //Create the open button.  We use the image from the JLF
+    //Graphics Repository (but we extracted it from the jar).
+    setDirectoryButton = new JButton("Set Directory");
+    setDirectoryButton.addActionListener(this);
+
+    //Create the save button.  We use the image from the JLF
+    //Graphics Repository (but we extracted it from the jar).
+    startButton = new JButton("Start Scans");
+    startButton.addActionListener(this);
+
+    stopButton = new JButton("Stop Scans");
+    stopButton.addActionListener(this);
+    //For layout purposes, put the buttons in a separate panel
+    JPanel buttonPanel = new JPanel(); //use FlowLayout
+    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+    buttonPanel.add(setDirectoryButton);
+    buttonPanel.add(Box.createHorizontalGlue());
+    buttonPanel.add(startButton);
+    buttonPanel.add(Box.createHorizontalGlue());
+    buttonPanel.add(stopButton);
+    
+    startDelayTime = new JLabel("Enter Start Delay Time");
+    delayBetweenScans = new JLabel("Enter Delay Between Scans");
+    scansPerFile = new JLabel("Enter Amount of Scans Per File");
+    startDelayField = new JTextField(1);
+    startDelayField.addActionListener(this);
+    amountOfScansPerFile = new JTextField(1);
+    amountOfScansPerFile.addActionListener(this);;
+    timeBetweenScans = new JTextField(1);
+    timeBetweenScans.addActionListener(this);
+    JPanel textFieldPanel = new JPanel();
+    textFieldPanel.setLayout(new BoxLayout(textFieldPanel, BoxLayout.Y_AXIS));
+    textFieldPanel.add(startDelayTime);
+    textFieldPanel.add(startDelayField);
+    textFieldPanel.add(scansPerFile);
+    textFieldPanel.add(amountOfScansPerFile);
+    textFieldPanel.add(delayBetweenScans);
+    textFieldPanel.add(timeBetweenScans);
+    
+   /*
+    JPanel buttonPanel2 = new JPanel(); 
+    buttonPanel2.setLayout(new BoxLayout(buttonPanel2, BoxLayout.X_AXIS));
+    JButton poop = new JButton("poop");
+    buttonPanel2.add(poop);
+    add(buttonPanel2, BorderLayout.NORTH);
+*/
+    
+    
+    add(textFieldPanel, BorderLayout.EAST);
+    //Add the buttons and the log to this panel.
+    add(buttonPanel, BorderLayout.NORTH);
+ 
+    add(logScrollPane, BorderLayout.CENTER);
+    log.append("WARNING! \nCURRENTLY USING DEFAULT SETTINGS \n" + "Directory: " + Radio.getDirectory()  + "\nStart Delay: " + Radio.getStartDelay() + "\nDelay: " + Radio.getDelay() + " Number of Scans: " + Radio.getNumberOfScans() + newline);
+}
+
+public void actionPerformed(ActionEvent e) {
+
+    //Handle open button action.
+    if (e.getSource() == setDirectoryButton) {// this only runs if you use the directory button
+        int returnVal = fc.showOpenDialog(ScanningFromManyReceivers.this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+           String directory = fc.getSelectedFile().getAbsolutePath(); //choose the root directory where all the sets of data will be stored
+           int x = 0;
+           while(new File(directory + "\\set" + x).exists()) x++; //find a directory that doesn't yet exist
+           new File(directory + "\\set" + x).mkdirs();//creates the directory as well as any parent directories that are missing
+           directorySet = true;
+           Radio.setDirectory(directory + "\\set" + x); //this creates different sets of data every time the program runs
+           Radio.updateSettingsFile();
+           log.append("Set Directory to: " + directory + "\\set" + x + newline);//tells the user that the directory has been changed
+        } else {
+            log.append("Open command cancelled by user." + newline);
+        }
+        log.setCaretPosition(log.getDocument().getLength());
+
+    //Handle save button action.
+    } else if (e.getSource() == stopButton) { //used to stop automation process in between scans
+    	if(scanTimer != null) scanTimer.stop();
+    	log.append("Stopped scans..." + newline);
+    	log.append("Converting Files to CSVs..." + newline);
+    	(new Converter(Radio.getDirectory())).start();
+    	
+    }
+    else if (e.getSource() == startButton){ // starts the first timer which is the startDelay timer to get away from equipment
+    	startTimer = new Timer(Radio.getStartDelay()*1000, this);
+    	startTimer.start();
+    	log.append("Timer set will start in ... " + Radio.getStartDelay() +"seconds " + newline);
+    	log.append("With scan delays at " + Radio.getDelay() + newline);
+    	
+    }else if(e.getSource() == startTimer){//called once the startTimer finishes its delay the scan timer is started which causes the delay between the scans
+    	log.append("Scans started" + newline);
+    	if(devices != null){//starts the scans simultaneously
+    	for(Radio r : devices){
+    		r.start();
+    		}
+    	if(scanTimer == null){//only runs once
+    		scanTimer = new Timer(Radio.getDelay(), this);//starts the scan timer after the first scan
+    		startTimer.stop();//stops the startDelay timer because its no longer needed
+    		startTimer = null;
+    	}
+    	}else{
+    		log.append("No devices connected" + newline);
+    	}
+    }
+    else if(e.getSource() == timeBetweenScans){//sets the time between scans for the scan timer
+    	Radio.setDelay(Integer.parseInt(timeBetweenScans.getText()));
+    	Radio.updateSettingsFile();//must be called to update the default settings in the settings file
+    	timeBetweenScans.selectAll();
+    	redisplaySettings();//rewrites the seetings for the user to see
+    }
+    else if(e.getSource() == amountOfScansPerFile){//sets how many scans per file you want
+    	Radio.setNumberOfScans(Byte.parseByte(amountOfScansPerFile.getText()));
+    	Radio.updateSettingsFile(); //must be called to update the default settings in the settings file
+    	amountOfScansPerFile.selectAll();
+    	redisplaySettings();//rewrites the seetings for the user to see
+    }
+    else if (e.getSource() == startDelayField){
+    	Radio.setStartDelay(Integer.parseInt(startDelayField.getText()));
+    	Radio.updateSettingsFile();
+    	startDelayField.selectAll();
+    	redisplaySettings();
+    }
+    }
+
+public void redisplaySettings(){
+	//shows the user the current settings
+	log.append("\n \n-CURRENT SETTINGS- \n" + "Directory: " + Radio.getDirectory()  + "\nStart Delay: " + Radio.getStartDelay() + "\nDelay: " + Radio.getDelay() + " Number of Scans: " + Radio.getNumberOfScans() + newline);
+
+}
+private static void createAndShowGUI() {
+    //Create and set up the window.
+    JFrame frame = new JFrame("FileChooserDemo");
+    frame.setResizable(false);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    //Add content to the window.
+    frame.add(new ScanningFromManyReceivers());
+
+    //Display the window.
+    frame.pack();
+    frame.setVisible(true);
+}
+	public static void main(String[] args) { // arrays that hold radio commands
+		
+		devices = new Radio[ SerialPortList.getPortNames().length]; // creates an object that handles communication with the Transceivers
+		int i = 0;
+		for (String s : SerialPortList.getPortNames()){ //creates and sets up serial port objects for each com
+			devices[i] = new Radio(s);
+			i++;
+		}
+		
+		
+		try{
+		if((new File(settingDir)).createNewFile()){ //only creates an new settings file if it doesnt exist already
+			PrintWriter out = new PrintWriter(new File(settingDir)); 
+			
+			out.println(Radio.getDirectory());
+			out.println(Radio.getDelay());
+			out.println(Radio.getNumberOfScans());
+			out.println(Radio.getStartDelay());
+			out.flush();
+			out.close();
+		}else{
+			Scanner input = new Scanner(new FileReader(settingDir)); //if it does exist then load the settings from the file
+			Radio.setDirectory(input.nextLine());
+			Radio.setDelay(Integer.parseInt(input.nextLine()));
+			Radio.setNumberOfScans(Byte.parseByte(input.nextLine()));
+			Radio.setStartDelay(Integer.parseInt(input.nextLine()));
+			input.close();
+			
+			
+		}
+		
+		}catch(Exception e){
+			System.out.println("Error reading settings File...\n" + e );
+		}
+		
+		SwingUtilities.invokeLater(new Runnable() {//show GUI
+            public void run() {
+                //Turn off metal's use of bold fonts
+                UIManager.put("swing.boldMetal", Boolean.FALSE); 
+                createAndShowGUI();
+            }
+        });
+	
+	}}
+
+	
+
+

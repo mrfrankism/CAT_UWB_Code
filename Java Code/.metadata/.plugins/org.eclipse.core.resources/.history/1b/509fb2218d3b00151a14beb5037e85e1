@@ -1,0 +1,140 @@
+package Package;
+import java.lang.Thread;
+import java.io.File;
+import java.io.PrintWriter;
+
+import jssc.*;
+
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+public class Radio extends Thread {
+static private String defaultDir = "C:\\Users\\Public\\set0\\";
+private SerialPort port;
+private static byte wantedScans;
+private static int delay;
+	int [] CATCONTROLREQUESTON = {
+			  0xA5, 0xA5, 0x00, 0x08, 0x20, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01
+			};
+	int [] CATCONTROLREQUESTOFF = {
+			  0xA5, 0xA5, 0x00, 0x08, 0x20, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00
+			};	
+	
+	Radio(){// creates multiple com ports for all connect radios meant for actual automation
+		String [] coms = new SerialPortList().getPortNames(); //sets an array with available com ports
+		SerialPort [] port  = new SerialPort[coms.length]; //creates and array of serial port objects
+		
+		try{
+		for (String s : coms){ //creates and sets up serial port objects for each com
+			int i = 0;
+			port[i] = new SerialPort(s);
+			port[i].setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_EVEN);
+			i++;
+			
+		}}catch(Exception e ){
+			System.out.println("No Com Ports found");
+		}
+		
+	}
+	Radio(String com, byte sn){//creates one com port for communication and sets the amount of scans per file 
+		wantedScans = sn;
+		try{
+		port  = new SerialPort(com); //creates and array of serial port objects
+		port.openPort();
+		port.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+		}catch(SerialPortException e ){
+			System.out.println(e);
+			System.out.println("Com Port: " + com +" not found :(");
+		}
+		
+	}	
+	 
+ public void run(){ 
+	 /*
+	  * This thread will start the Transeiver scanning and collect a certain amount
+	  * of scans and then stop the radio to conclude communication.
+	  */
+	 try{
+		
+		 PrintWriter writer = new PrintWriter(new File(defaultDir + new SimpleDateFormat("mm_ss").format(new Date()) + ".txt"));
+		 
+	 port.writeIntArray(CATCONTROLREQUESTON); // writes the command to start scanning
+	 
+	 boolean finishedRecording = false; // this insures that even if the buffer is empty we will still record data
+	 byte zeroCounter = 0; //this is used to see when one scan ends
+	 byte scanNumber = 0; // tracks how many scans have been recorded
+	 
+	 while(!finishedRecording){
+		 while(port.getInputBufferBytesCount() > 0){
+			 
+			 byte buffer = port.readBytes(1)[0];
+			 if(buffer == 0){
+				 zeroCounter++;//adds one if the byte is equal to zero
+				 
+				 if(zeroCounter == 40){//if we've gotten 40 zeros in a row we've completed one scan
+					 scanNumber++; // adds one to track what scan we're on
+					 zeroCounter = 0;//resets the zeroCounter to get ready for a new scan
+					 if(wantedScans == scanNumber){// checks to see if we have the amount of necessary scans
+						 writer.flush();
+						 writer.close();
+						 finishedRecording = true;
+					 }else{
+						 writer.println(); //writes a blank line to the file to show the start of a new scan
+					 }
+				 }else{ // if we got a zero but zeroCounter is not at the max write the zero to the file
+					 writer.print(buffer);
+				 }
+				 
+			 }else{//if the byte does not equal zero write it to the file
+				 writer.print(buffer);
+				 zeroCounter = 0; // resets the counter because the chain of zeros has been broken
+			 }
+			 
+		 }
+	 }
+	 
+	 port.writeIntArray(CATCONTROLREQUESTOFF);// Writes the command to stop scanning
+	 
+	 }catch(Exception e){
+		 System.out.println(e);
+	 }
+	 
+	 
+ }
+public static void setDirectory(String d) {
+	 defaultDir = d;
+	 changeSettingsFile();
+}
+public static void setDelay(int d){
+	delay = d;
+	changeSettingsFile();
+}
+public static void setNumberOfScans(byte n){
+	wantedScans = n;
+	changeSettingsFile();
+}
+public static byte getNumberOfScans(){
+	return wantedScans;
+}
+public static int getDelay(){
+	return delay;
+}
+public static String getDirectory(){
+	return defaultDir;
+}
+private static void changeSettingsFile(){
+	(new ScanningFromManyReceivers()).appendLog("Writing to settings file");
+	try{
+	PrintWriter out = new PrintWriter(new File("C:\\Users\\Public\\settings.txt"));
+	out.println(Radio.getDirectory());
+	out.println(Radio.getDelay());
+	out.println(Radio.getNumberOfScans());
+	out.flush();
+	out.close();
+	(new ScanningFromManyReceivers()).appendLog("Done Writing to file");
+}catch(Exception e ){
+	(new ScanningFromManyReceivers()).appendLog("File Not Found....");
+}
+}}

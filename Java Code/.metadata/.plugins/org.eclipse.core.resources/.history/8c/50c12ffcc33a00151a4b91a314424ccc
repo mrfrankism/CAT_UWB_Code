@@ -1,0 +1,62 @@
+package Package;
+import java.lang.Thread;
+
+import jssc.*;
+public class Radio extends Thread {
+private SerialPort port;
+	int [] CATCONTROLREQUESTON = {
+			  0xA5, 0xA5, 0x00, 0x08, 0x20, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01
+			};
+	int [] CATCONTROLREQUESTOFF = {
+			  0xA5, 0xA5, 0x00, 0x08, 0x20, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00
+			};	
+	
+	Radio(){// creates multiple com ports for all connect radios meant for actual automation
+		String [] coms = new SerialPortList().getPortNames(); //sets an array with available com ports
+		SerialPort [] port  = new SerialPort[coms.length]; //creates and array of serial port objects
+		
+		try{
+		for (String s : coms){ //creates and sets up serial port objects for each com
+			int i = 0;
+			port[i] = new SerialPort(s);
+			port[i].setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_EVEN);
+			i++;
+			
+		}}catch(Exception e ){
+			System.out.println("No Com Ports found");
+		}
+		
+	}
+	Radio(String com){//creates one com port for communication mainly meant for debugging
+		
+		try{
+		port  = new SerialPort(com); //creates and array of serial port objects
+		port.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_EVEN);
+		}catch(Exception e ){
+			System.out.println("Com Port: " + com +" not found :(");
+		}
+		
+	}	
+	
+ public void run(){ 
+	 /*
+	  * This thread will start the Transeiver scanning and collect a certain amount
+	  * of scans and then stop the radio to conclude communication.
+	  */
+	 try{
+		 
+	 port.writeIntArray(CATCONTROLREQUESTON); // writes the command to start scanning
+	 
+	 
+	 
+	 
+	 
+	 port.writeIntArray(CATCONTROLREQUESTOFF);// Writes the command to stop scanning
+	 
+	 }catch(Exception e){
+		 System.out.println("Problem running with port: " + port.getPortName());
+	 }
+	 
+	 
+ }
+}
