@@ -16,12 +16,10 @@ private SerialPort port;
 private static byte wantedScans = 1;
 private static int delay = 2;
 private static int startDelay = 5;
-
-
-	int [] CATCONTROLREQUESTON = { //this is the preset command set by the device to START transmitting/receiving
+	int [] CATCONTROLREQUESTON = {
 			  0xA5, 0xA5, 0x00, 0x08, 0x20, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01
 			};
-	int [] CATCONTROLREQUESTOFF = { //this is the preset command set by the device to STOP transmitting/receiving
+	int [] CATCONTROLREQUESTOFF = {
 			  0xA5, 0xA5, 0x00, 0x08, 0x20, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00
 			};	
 	
