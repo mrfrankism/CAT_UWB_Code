@@ -1,4 +1,4 @@
--------------------------------------------------General Information-------------------------------------------------------------
+# General Information
 
 Code was written using processing 2.2.1, mainly because of the simplicity of setting up serial communications, and being able to use many of Java's data structures. Commands sent to
 the P410 equipment were based on the CAT (Channel Analysis Tool) P410 API commands which can be found at "http://www.timedomain.com/datasheets/320-0305B%20CAT%20API%20Specification.pdf", 
