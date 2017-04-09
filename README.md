@@ -1,5 +1,8 @@
  <div align="center"><h1>General Information</h1></div>
 
+This was a summer internship that was done my junior year of high school (2015). I had to create an automatic system that would start and stop a device to measure the frequency response of a room automatically.
+
+
 Code was written using processing 2.2.1, mainly because of the simplicity of setting up serial communications, and being able to use many of Java's data structures. Commands sent to
 the P410 equipment were based on the CAT (Channel Analysis Tool) P410 API commands which can be found at "http://www.timedomain.com/datasheets/320-0305B%20CAT%20API%20Specification.pdf", 
 the USB and Serial user guide also details neccessary communication protocols and can be found here "http://www.timedomain.com/datasheets/320-0287E%20Using%20the%20USB%20and%20Serial%20Interfaces.pdf".
@@ -13,7 +16,7 @@ Questions, concerns or issues can be email to francoab10@gmail.com or opened up 
 
 ------------------------------------------------------------------------------------------------------------------------------
 
-							******** PENDING TODO: *********
+<div align="center"><h2>Pending To-Do</h2></div>
 
  - Create a String variable to easily change the conversion from CSV to a simple text file that can be used for other purposes
 
@@ -28,8 +31,7 @@ Questions, concerns or issues can be email to francoab10@gmail.com or opened up 
  - Make General Installation instructions in the ReadMe at least for Windows
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
-
-							********* UPDATES: *********
+ <div align="center"><h2>Updates</h2></div>
 
 ________________________________________________________________As of 07/15/15_____________________________________________________________________________
 
